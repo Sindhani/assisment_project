@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -24,6 +25,14 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        User::create([
+          'name' => 'super-admin',
+          'email' => 'admin@dev.com',
+          'password' => \Illuminate\Support\Facades\Hash::make('password'),
+          'is_admin' => 2,
+          'sub_domain' => null
+        ]);
     }
 
     /**

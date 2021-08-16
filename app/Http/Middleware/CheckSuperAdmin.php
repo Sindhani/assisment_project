@@ -16,9 +16,16 @@ class CheckSuperAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        if(auth()->check() && auth()->user()->is_admin == 2){
+        $respnse = $next($request);
+
+        if(auth()->check() && auth()->user()->is_admin === 2){
             return redirect()->route('superadmin');
         }
-        return $next($request);
+        if(auth()->check() && auth()->user()->is_admin != 2){
+            $subdomain = auth()->user()->sub_domain;
+            return redirect("http://".$subdomain.".".config('app.short_url').'/home');
+        }
+        return $respnse;
+
     }
 }

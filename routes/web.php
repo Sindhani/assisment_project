@@ -22,7 +22,23 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/super-adming', function () {
+Route::middleware('guest')->group(function(){
+    Route::get('login', [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+});
+
+Route::middleware(['superadmin', 'web'])->group(function(){
+    Route::post('login', [\App\Http\Controllers\Auth\LoginController::class, 'login']);
+});
+
+Route::middleware('auth')->group(function(){
+    Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+});
+
+Route::middleware('guest')->group(function(){
+    Route::get('register', [\App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
+});
+
+Route::get('/super-admin', function () {
     $users = User::all();
     return view('back_end.superadmin.dashboard', compact('users'));
 })->name('superadmin');
@@ -36,12 +52,14 @@ Route::post('assign-domain',function (Request $request){
 Route::get('users', [UserController::class, 'index'])->name('users');
 Route::post('list-users', [UserController::class, 'listUser'])->name('list-users');
 
-Route::domain('{account}'.".".config('short_url','localhost'))->group(function ($account){
-//    dd($account);
-    Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
-    Route::post('login', 'Auth\LoginController@login');
+Route::domain('{account?}.'.config('short_url','localhost.test'))->group(function (){
+    Route::post('login', [\App\Http\Controllers\Auth\LoginController::class, 'login']);
 
 });
+
+
+
+
 Route::get('test',function(){
 
 $x = '0.0.0.0';
@@ -62,6 +80,5 @@ $z = 'websitename.com';
     echo $process->getOutput();
 });
 
-Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
